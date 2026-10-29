@@ -1,6 +1,10 @@
 package minibank;
 
-public abstract class Account {
+import java.io.Serializable;
+
+public abstract class Account implements Serializable {
+    private static final long serialVersionUID = 1L; // Ensures version compatibility during saves
+    
     private final String accountNumber;
     private String ownerName;
     protected long balance;

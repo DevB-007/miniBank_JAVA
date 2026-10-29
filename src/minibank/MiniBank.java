@@ -110,6 +110,7 @@ public class MiniBank {
                         System.out.println("Transfer successful.");
                         break;
                     case EXIT: 
+                        manager.saveData(); // <--- Saves the file right before closing
                         System.out.println("Thank you for using MiniBank. Goodbye!"); 
                         running = false;
                         break;
