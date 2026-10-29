@@ -21,8 +21,8 @@ public class MiniBank {
         WITHDRAW(3),
         TRANSFER(4),
         EXIT(5),
-        TEST_THREADS(6),
-        CHECK_BALANCE(7); // Kept from your request
+        CHECK_BALANCE(6),
+        ANALYTICS(7);
 
         private final int optionNumber;
 
@@ -57,8 +57,8 @@ public class MiniBank {
             System.out.println("3. Withdraw");
             System.out.println("4. Transfer");
             System.out.println("5. Exit");
-            System.out.println("6. Stress Test (Multithreading)");
-            System.out.println("7. Check Balance");
+            System.out.println("6. Check Balance");
+            System.out.println("7. Bank Analytics (Leaderboard & Frequencies)");
             System.out.print("Enter your choice (1-7): ");
 
             if (!scanner.hasNextInt()) {
@@ -122,21 +122,14 @@ public class MiniBank {
                         System.out.println("Thank you for using MiniBank. Goodbye!"); 
                         running = false;
                         break;
-                    case TEST_THREADS:
-                        System.out.print("Enter account number to stress test: ");
-                        String testAcc = scanner.next();
-                        System.out.println("Spawning multiple ATMs (Threads)...");
-                        Thread t1 = new Thread(new TransactionJob(manager, testAcc, true, 2000), "ATM-1");
-                        Thread t2 = new Thread(new TransactionJob(manager, testAcc, false, 500), "ATM-2");
-                        t1.start(); t2.start();
-                        t1.join(); t2.join();
-                        System.out.println("Multithread test complete.");
-                        break;
                     case CHECK_BALANCE:
                         System.out.print("Enter account number: ");
                         String balAcc = scanner.next();
                         long balance = manager.getBalance(balAcc);
                         System.out.println("Current Balance for " + balAcc + ": " + balance);
+                        break;
+                    case ANALYTICS:
+                        manager.showAnalytics();
                         break;
                 }
             } catch (AccountNotFoundException | InsufficientFundsException e) {

@@ -1,15 +1,25 @@
 package minibank;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BankManager implements BankOperations {
     private Map<String, Account> accounts = new HashMap<>();
     private static final String DATA_FILE = "bank_data.ser";
 
+    private transient Map<String, Integer> transactionCounts;
+
     public BankManager() {
+        initTransactionCounts();
         loadData();
+    }
+
+    private void initTransactionCounts() {
+        transactionCounts = new HashMap<>();
+        transactionCounts.put("OPEN_ACCOUNT", 0);
+        transactionCounts.put("DEPOSIT", 0);
+        transactionCounts.put("WITHDRAW", 0);
+        transactionCounts.put("TRANSFER", 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -42,6 +52,7 @@ public class BankManager implements BankOperations {
         ReflectionValidator.validate(newAccount);
 
         accounts.put(newAccount.getAccountNumber(), newAccount);
+        transactionCounts.put("OPEN_ACCOUNT", transactionCounts.get("OPEN_ACCOUNT") + 1);
         return newAccount.getAccountNumber();
     }
 
@@ -57,12 +68,14 @@ public class BankManager implements BankOperations {
     public void deposit(String accountNumber, long amount) throws AccountNotFoundException {
         Account acc = findAccount(accountNumber);
         acc.deposit(amount);
+        transactionCounts.put("DEPOSIT", transactionCounts.get("DEPOSIT") + 1);
     }
 
     @Override
     public void withdraw(String accountNumber, long amount) throws AccountNotFoundException, InsufficientFundsException {
         Account acc = findAccount(accountNumber);
         acc.withdraw(amount);
+        transactionCounts.put("WITHDRAW", transactionCounts.get("WITHDRAW") + 1);
     }
 
     @Override
@@ -72,11 +85,40 @@ public class BankManager implements BankOperations {
         
         from.withdraw(amount);
         to.deposit(amount);
+        transactionCounts.put("TRANSFER", transactionCounts.get("TRANSFER") + 1);
     }
 
     @Override
     public long getBalance(String accountNumber) throws AccountNotFoundException {
         Account acc = findAccount(accountNumber);
         return acc.getBalance();
+    }
+
+    @Override
+    public void showAnalytics() {
+        Set<String> uniqueCustomers = new HashSet<>();
+        for (Account acc : accounts.values()) {
+            uniqueCustomers.add(acc.getOwnerName());
+        }
+
+        List<Account> leaderboard = new ArrayList<>(accounts.values());
+        leaderboard.sort((a, b) -> Long.compare(b.getBalance(), a.getBalance()));
+
+        System.out.println("\n--- Bank Analytics ---");
+        System.out.println("Total Unique Customers: " + uniqueCustomers.size());
+        System.out.println("Customer Names: " + uniqueCustomers);
+
+        System.out.println("\nSession Transaction Frequency:");
+        for (Map.Entry<String, Integer> entry : transactionCounts.entrySet()) {
+            System.out.println("- " + entry.getKey() + ": " + entry.getValue());
+        }
+
+        System.out.println("\nTop 3 Accounts Leaderboard (By Balance):");
+        int limit = Math.min(3, leaderboard.size());
+        for (int i = 0; i < limit; i++) {
+            Account acc = leaderboard.get(i);
+            System.out.println((i + 1) + ". " + acc.getOwnerName() + " (" + acc.getAccountNumber() + ") - Balance: " + acc.getBalance());
+        }
+        System.out.println("----------------------");
     }
 }
