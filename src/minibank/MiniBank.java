@@ -44,18 +44,7 @@ public class MiniBank {
         System.out.println("Welcome to " + bankInfo.getName() + " (" + bankInfo.getBranch() + ")");
         System.out.println("==========================================\n");
 
-        System.out.println("--- Practical 5 Tests ---");
-        Account[] accounts = new Account[2];
-        accounts[0] = new SavingsAccount("Riya", 5000, 4.0);
-        accounts[1] = new CurrentAccount("Dev", 2000, 10000);
-
-        accounts[0].applyInterest();
-        accounts[1].withdraw(5000); 
-
-        for (Account acc : accounts) {
-            System.out.println(acc.toString() + " | Type: " + acc.getClass().getSimpleName());
-        }
-
+        BankManager manager = new BankManager();
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
@@ -82,29 +71,60 @@ public class MiniBank {
                 continue;
             }
 
-            String message = "";
             switch (option) {
                 case OPEN_ACCOUNT: 
-                    message = "Open Account to be implemented in a later lab."; 
+                    System.out.print("Enter owner name (no spaces): ");
+                    String name = scanner.next();
+                    System.out.print("Enter initial balance: ");
+                    long initBal = scanner.nextLong();
+                    System.out.print("Enter 1 for Savings, 2 for Current: ");
+                    int type = scanner.nextInt();
+                    String newAcc = manager.openAccount(name, initBal, type);
+                    if (newAcc != null) {
+                        System.out.println("Success! Account No: " + newAcc);
+                    } else {
+                        System.out.println("Failed to open account.");
+                    }
                     break;
                 case DEPOSIT: 
-                    message = "Deposit to be implemented in a later lab."; 
+                    System.out.print("Enter account number: ");
+                    String depAcc = scanner.next();
+                    System.out.print("Enter deposit amount: ");
+                    long depAmt = scanner.nextLong();
+                    if (manager.deposit(depAcc, depAmt)) {
+                        System.out.println("Deposit successful.");
+                    } else {
+                        System.out.println("Deposit failed. Check account number.");
+                    }
                     break;
                 case WITHDRAW: 
-                    message = "Withdraw to be implemented in a later lab."; 
+                    System.out.print("Enter account number: ");
+                    String drawAcc = scanner.next();
+                    System.out.print("Enter withdrawal amount: ");
+                    long drawAmt = scanner.nextLong();
+                    if (manager.withdraw(drawAcc, drawAmt)) {
+                        System.out.println("Withdrawal successful.");
+                    } else {
+                        System.out.println("Withdrawal failed. Check balance or account number.");
+                    }
                     break;
                 case TRANSFER: 
-                    message = "Transfer to be implemented in a later lab."; 
+                    System.out.print("Enter source account number: ");
+                    String fromAcc = scanner.next();
+                    System.out.print("Enter destination account number: ");
+                    String toAcc = scanner.next();
+                    System.out.print("Enter transfer amount: ");
+                    long transAmt = scanner.nextLong();
+                    if (manager.transfer(fromAcc, toAcc, transAmt)) {
+                        System.out.println("Transfer successful.");
+                    } else {
+                        System.out.println("Transfer failed.");
+                    }
                     break;
                 case EXIT: 
-                    message = "Thank you for using MiniBank. Goodbye!"; 
+                    System.out.println("Thank you for using MiniBank. Goodbye!"); 
+                    running = false;
                     break;
-            }
-
-            System.out.println(message);
-
-            if (option == MenuOption.EXIT) {
-                running = false;
             }
         }
 
