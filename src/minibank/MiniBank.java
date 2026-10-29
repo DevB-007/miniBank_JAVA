@@ -4,7 +4,16 @@ import java.util.Scanner;
 
 public class MiniBank {
 
-    record BankInfo(String name, String branch) {}
+    static class BankInfo {
+        private String name;
+        private String branch;
+        public BankInfo(String name, String branch) {
+            this.name = name;
+            this.branch = branch;
+        }
+        public String getName() { return name; }
+        public String getBranch() { return branch; }
+    }
 
     enum MenuOption {
         OPEN_ACCOUNT(1),
@@ -17,10 +26,6 @@ public class MiniBank {
 
         MenuOption(int optionNumber) {
             this.optionNumber = optionNumber;
-        }
-
-        public int getOptionNumber() {
-            return optionNumber;
         }
 
         public static MenuOption fromInt(int choice) {
@@ -36,8 +41,19 @@ public class MiniBank {
     public static void main(String[] args) {
         BankInfo bankInfo = new BankInfo("CHARUSAT National Bank", "Changa Branch");
         System.out.println("==========================================");
-        System.out.println("Welcome to " + bankInfo.name() + " (" + bankInfo.branch() + ")");
-        System.out.println("==========================================");
+        System.out.println("Welcome to " + bankInfo.getName() + " (" + bankInfo.getBranch() + ")");
+        System.out.println("==========================================\n");
+
+        Account[] accounts = new Account[3];
+        accounts[0] = new Account("Riya", 5000);
+        accounts[1] = new Account("Dev");
+        accounts[2] = new Account("Zara", 10000);
+
+        accounts[0].deposit(2000);
+        accounts[0].withdraw(3000);
+        accounts[0].withdraw(10000);
+        
+        System.out.println("Account 0 Balance: " + accounts[0].getBalance());
 
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -65,13 +81,24 @@ public class MiniBank {
                 continue;
             }
 
-            String message = switch (option) {
-                case OPEN_ACCOUNT -> "Open Account to be implemented in a later lab.";
-                case DEPOSIT -> "Deposit to be implemented in a later lab.";
-                case WITHDRAW -> "Withdraw to be implemented in a later lab.";
-                case TRANSFER -> "Transfer to be implemented in a later lab.";
-                case EXIT -> "Thank you for using MiniBank. Goodbye!";
-            };
+            String message = "";
+            switch (option) {
+                case OPEN_ACCOUNT: 
+                    message = "Open Account to be implemented in a later lab."; 
+                    break;
+                case DEPOSIT: 
+                    message = "Deposit to be implemented in a later lab."; 
+                    break;
+                case WITHDRAW: 
+                    message = "Withdraw to be implemented in a later lab."; 
+                    break;
+                case TRANSFER: 
+                    message = "Transfer to be implemented in a later lab."; 
+                    break;
+                case EXIT: 
+                    message = "Thank you for using MiniBank. Goodbye!"; 
+                    break;
+            }
 
             System.out.println(message);
 
@@ -81,5 +108,6 @@ public class MiniBank {
         }
 
         scanner.close();
+        System.out.println("25CE009");
     }
 }
