@@ -1,5 +1,6 @@
 package minibank;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class MiniBank {
@@ -22,7 +23,9 @@ public class MiniBank {
         TRANSFER(4),
         EXIT(5),
         CHECK_BALANCE(6),
-        ANALYTICS(7);
+        ANALYTICS(7),
+        HISTORY(8),
+        STATISTICS(9);
 
         private final int optionNumber;
 
@@ -56,10 +59,12 @@ public class MiniBank {
             System.out.println("2. Deposit");
             System.out.println("3. Withdraw");
             System.out.println("4. Transfer");
-            System.out.println("5. Exit");
+            System.out.println("5. Exit and Save");
             System.out.println("6. Check Balance");
-            System.out.println("7. Bank Analytics (Leaderboard & Frequencies)");
-            System.out.print("Enter your choice (1-7): ");
+            System.out.println("7. Bank Analytics (Leaderboard)");
+            System.out.println("8. Session History (Generic Stack)");
+            System.out.println("9. Global Statistics (Bounded Generics)");
+            System.out.print("Enter your choice (1-9): ");
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a valid number.");
@@ -71,7 +76,7 @@ public class MiniBank {
             MenuOption option = MenuOption.fromInt(choice);
 
             if (option == null) {
-                System.out.println("Invalid choice. Please select between 1 and 7.");
+                System.out.println("Invalid choice. Please select between 1 and 9.");
                 continue;
             }
 
@@ -130,6 +135,16 @@ public class MiniBank {
                         break;
                     case ANALYTICS:
                         manager.showAnalytics();
+                        break;
+                    case HISTORY:
+                        System.out.print("Enter account number for history: ");
+                        String histAcc = scanner.next();
+                        List<String> history = manager.getHistory(histAcc);
+                        System.out.println("\n--- Recent Transactions ---");
+                        for (String log : history) System.out.println(" > " + log);
+                        break;
+                    case STATISTICS:
+                        manager.showStatistics();
                         break;
                 }
             } catch (AccountNotFoundException | InsufficientFundsException e) {

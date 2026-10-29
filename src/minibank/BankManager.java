@@ -8,18 +8,20 @@ public class BankManager implements BankOperations {
     private static final String DATA_FILE = "bank_data.ser";
 
     private transient Map<String, Integer> transactionCounts;
+    private transient Map<String, TransactionStack<String>> accountHistory;
 
     public BankManager() {
-        initTransactionCounts();
+        initTransientFields();
         loadData();
     }
 
-    private void initTransactionCounts() {
+    private void initTransientFields() {
         transactionCounts = new HashMap<>();
         transactionCounts.put("OPEN_ACCOUNT", 0);
         transactionCounts.put("DEPOSIT", 0);
         transactionCounts.put("WITHDRAW", 0);
         transactionCounts.put("TRANSFER", 0);
+        accountHistory = new HashMap<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -27,6 +29,10 @@ public class BankManager implements BankOperations {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DATA_FILE))) {
             accounts = (Map<String, Account>) ois.readObject();
             System.out.println("[System] Previous bank data loaded successfully.");
+            for (String accNum : accounts.keySet()) {
+                accountHistory.put(accNum, new TransactionStack<>());
+                accountHistory.get(accNum).push("Session Start: Loaded from file.");
+            }
         } catch (FileNotFoundException e) {
             System.out.println("[System] No previous data found. Starting fresh.");
         } catch (IOException | ClassNotFoundException e) {
@@ -53,6 +59,10 @@ public class BankManager implements BankOperations {
 
         accounts.put(newAccount.getAccountNumber(), newAccount);
         transactionCounts.put("OPEN_ACCOUNT", transactionCounts.get("OPEN_ACCOUNT") + 1);
+        
+        accountHistory.put(newAccount.getAccountNumber(), new TransactionStack<>());
+        accountHistory.get(newAccount.getAccountNumber()).push("Account Opened with " + initialBalance);
+        
         return newAccount.getAccountNumber();
     }
 
@@ -69,6 +79,7 @@ public class BankManager implements BankOperations {
         Account acc = findAccount(accountNumber);
         acc.deposit(amount);
         transactionCounts.put("DEPOSIT", transactionCounts.get("DEPOSIT") + 1);
+        accountHistory.get(accountNumber).push("Deposited: +" + amount);
     }
 
     @Override
@@ -76,6 +87,7 @@ public class BankManager implements BankOperations {
         Account acc = findAccount(accountNumber);
         acc.withdraw(amount);
         transactionCounts.put("WITHDRAW", transactionCounts.get("WITHDRAW") + 1);
+        accountHistory.get(accountNumber).push("Withdrew: -" + amount);
     }
 
     @Override
@@ -86,6 +98,9 @@ public class BankManager implements BankOperations {
         from.withdraw(amount);
         to.deposit(amount);
         transactionCounts.put("TRANSFER", transactionCounts.get("TRANSFER") + 1);
+        
+        accountHistory.get(fromAccount).push("Transferred Out: -" + amount + " to " + toAccount);
+        accountHistory.get(toAccount).push("Transferred In: +" + amount + " from " + fromAccount);
     }
 
     @Override
@@ -95,30 +110,41 @@ public class BankManager implements BankOperations {
     }
 
     @Override
+    public List<String> getHistory(String accountNumber) throws AccountNotFoundException {
+        findAccount(accountNumber);
+        return accountHistory.get(accountNumber).getHistory();
+    }
+
+    @Override
+    public void showStatistics() {
+        AccountStats<Account> stats = new AccountStats<>(accounts.values());
+        System.out.println("\n--- Global Bank Statistics ---");
+        System.out.println("Total Bank Assets: " + stats.getTotalAssets());
+        System.out.printf("Average Account Balance: %.2f\n", stats.getAverageBalance());
+        System.out.println("------------------------------");
+    }
+
+    @Override
     public void showAnalytics() {
         Set<String> uniqueCustomers = new HashSet<>();
-        for (Account acc : accounts.values()) {
-            uniqueCustomers.add(acc.getOwnerName());
-        }
+        for (Account acc : accounts.values()) uniqueCustomers.add(acc.getOwnerName());
 
         List<Account> leaderboard = new ArrayList<>(accounts.values());
         leaderboard.sort((a, b) -> Long.compare(b.getBalance(), a.getBalance()));
 
         System.out.println("\n--- Bank Analytics ---");
         System.out.println("Total Unique Customers: " + uniqueCustomers.size());
-        System.out.println("Customer Names: " + uniqueCustomers);
-
+        
         System.out.println("\nSession Transaction Frequency:");
         for (Map.Entry<String, Integer> entry : transactionCounts.entrySet()) {
             System.out.println("- " + entry.getKey() + ": " + entry.getValue());
         }
 
-        System.out.println("\nTop 3 Accounts Leaderboard (By Balance):");
+        System.out.println("\nTop Accounts Leaderboard:");
         int limit = Math.min(3, leaderboard.size());
         for (int i = 0; i < limit; i++) {
             Account acc = leaderboard.get(i);
             System.out.println((i + 1) + ". " + acc.getOwnerName() + " (" + acc.getAccountNumber() + ") - Balance: " + acc.getBalance());
         }
-        System.out.println("----------------------");
     }
 }
