@@ -13,7 +13,7 @@ public class CurrentAccount extends Account {
     }
 
     @Override
-    public void withdraw(long amount) throws InsufficientFundsException {
+    public synchronized void withdraw(long amount) throws InsufficientFundsException {
         if (amount > 0) {
             if ((balance + overdraftLimit) >= amount) {
                 balance -= amount;

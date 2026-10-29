@@ -3,7 +3,7 @@ package minibank;
 import java.io.Serializable;
 
 public abstract class Account implements Serializable {
-    private static final long serialVersionUID = 1L; // Ensures version compatibility during saves
+    private static final long serialVersionUID = 1L;
     
     private final String accountNumber;
     private String ownerName;
@@ -25,13 +25,13 @@ public abstract class Account implements Serializable {
 
     public abstract void applyInterest();
 
-    public void deposit(long amount) {
+    public synchronized void deposit(long amount) {
         if (amount > 0) {
             balance += amount;
         }
     }
 
-    public void withdraw(long amount) throws InsufficientFundsException {
+    public synchronized void withdraw(long amount) throws InsufficientFundsException {
         if (amount > 0) {
             if (balance >= amount) {
                 balance -= amount;

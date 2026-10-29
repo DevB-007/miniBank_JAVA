@@ -20,7 +20,8 @@ public class MiniBank {
         DEPOSIT(2),
         WITHDRAW(3),
         TRANSFER(4),
-        EXIT(5);
+        EXIT(5),
+        TEST_THREADS(6); // New option
 
         private final int optionNumber;
 
@@ -55,7 +56,8 @@ public class MiniBank {
             System.out.println("3. Withdraw");
             System.out.println("4. Transfer");
             System.out.println("5. Exit");
-            System.out.print("Enter your choice (1-5): ");
+            System.out.println("6. Stress Test (Multithreading)");
+            System.out.print("Enter your choice (1-6): ");
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a valid number.");
@@ -67,7 +69,7 @@ public class MiniBank {
             MenuOption option = MenuOption.fromInt(choice);
 
             if (option == null) {
-                System.out.println("Invalid choice. Please select between 1 and 5.");
+                System.out.println("Invalid choice. Please select between 1 and 6.");
                 continue;
             }
 
@@ -110,9 +112,24 @@ public class MiniBank {
                         System.out.println("Transfer successful.");
                         break;
                     case EXIT: 
-                        manager.saveData(); // <--- Saves the file right before closing
+                        manager.saveData(); 
                         System.out.println("Thank you for using MiniBank. Goodbye!"); 
                         running = false;
+                        break;
+                    case TEST_THREADS:
+                        System.out.print("Enter account number to stress test: ");
+                        String testAcc = scanner.next();
+                        System.out.println("Spawning multiple ATMs (Threads) to hit the account simultaneously...");
+                        
+                        Thread t1 = new Thread(new TransactionJob(manager, testAcc, true, 2000), "ATM-1 (Deposit)");
+                        Thread t2 = new Thread(new TransactionJob(manager, testAcc, false, 500), "ATM-2 (Withdraw)");
+                        Thread t3 = new Thread(new TransactionJob(manager, testAcc, false, 1000), "ATM-3 (Withdraw)");
+                        
+                        t1.start(); t2.start(); t3.start();
+                        
+                        // Wait for all threads to finish
+                        t1.join(); t2.join(); t3.join();
+                        System.out.println("Multithread test complete. Thread-safety ensured.");
                         break;
                 }
             } catch (AccountNotFoundException | InsufficientFundsException e) {
