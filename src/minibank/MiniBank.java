@@ -44,28 +44,17 @@ public class MiniBank {
         System.out.println("Welcome to " + bankInfo.getName() + " (" + bankInfo.getBranch() + ")");
         System.out.println("==========================================\n");
 
-        Account acc1 = new Account("Riya", 4000);
-        Account acc2 = new Account("Dev", 5000);
-        
-        System.out.println(acc1.toString());
-        System.out.println("acc1 equals acc2? " + acc1.equals(acc2));
-        
-        try {
-            Customer cust = new Customer("Riya", "riya@test.com", "9876543210");
-            Customer clonedCust = (Customer) cust.clone();
-            System.out.println("Cloned Customer Name: " + clonedCust.getName());
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+        System.out.println("--- Practical 5 Tests ---");
+        Account[] accounts = new Account[2];
+        accounts[0] = new SavingsAccount("Riya", 5000, 4.0);
+        accounts[1] = new CurrentAccount("Dev", 2000, 10000);
 
-        System.out.println("\n--- Practical 4 Tests ---");
-        System.out.println("Validating Mobile '9876543210': " + Validator.isValidMobile("9876543210"));
-        System.out.println("Validating Email 'test@bank.com': " + Validator.isValidEmail("test@bank.com"));
-        
-        Command cmd = CommandParser.parse("DEPOSIT AC0001 500");
-        System.out.println("Parsed Command: Type=" + cmd.type() + ", Account=" + cmd.accountNumber() + ", Amount=" + cmd.amount());
-        
-        System.out.print(StatementFormatter.buildStatement(acc1));
+        accounts[0].applyInterest();
+        accounts[1].withdraw(5000); 
+
+        for (Account acc : accounts) {
+            System.out.println(acc.toString() + " | Type: " + acc.getClass().getSimpleName());
+        }
 
         Scanner scanner = new Scanner(System.in);
         boolean running = true;

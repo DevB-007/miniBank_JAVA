@@ -1,9 +1,9 @@
 package minibank;
 
-public class Account {
+public abstract class Account {
     private final String accountNumber;
     private String ownerName;
-    private long balance;
+    protected long balance;
     private boolean active;
     
     private static long accountCounter = 1;
@@ -18,6 +18,8 @@ public class Account {
     public Account(String ownerName) {
         this(ownerName, 0);
     }
+
+    public abstract void applyInterest();
 
     public void deposit(long amount) {
         if (amount > 0) {
