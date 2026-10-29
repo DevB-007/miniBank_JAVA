@@ -49,18 +49,23 @@ public class MiniBank {
         
         System.out.println(acc1.toString());
         System.out.println("acc1 equals acc2? " + acc1.equals(acc2));
-        System.out.println("Is acc1 an Account? " + (acc1 instanceof Account));
         
         try {
             Customer cust = new Customer("Riya", "riya@test.com", "9876543210");
-            Customer.Address addr = new Customer.Address("123 Main St", "Jamnagar", "361001");
-            cust.setAddress(addr);
-            
             Customer clonedCust = (Customer) cust.clone();
             System.out.println("Cloned Customer Name: " + clonedCust.getName());
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
+
+        System.out.println("\n--- Practical 4 Tests ---");
+        System.out.println("Validating Mobile '9876543210': " + Validator.isValidMobile("9876543210"));
+        System.out.println("Validating Email 'test@bank.com': " + Validator.isValidEmail("test@bank.com"));
+        
+        Command cmd = CommandParser.parse("DEPOSIT AC0001 500");
+        System.out.println("Parsed Command: Type=" + cmd.type() + ", Account=" + cmd.accountNumber() + ", Amount=" + cmd.amount());
+        
+        System.out.print(StatementFormatter.buildStatement(acc1));
 
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
