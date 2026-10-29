@@ -12,15 +12,11 @@ public class Account {
         this.ownerName = ownerName;
         this.balance = openingBalance;
         this.active = true;
-        this.accountNumber = generateAccountNumber();
+        this.accountNumber = String.format("AC%04d", accountCounter++);
     }
 
     public Account(String ownerName) {
         this(ownerName, 0);
-    }
-
-    private static String generateAccountNumber() {
-        return String.format("AC%04d", accountCounter++);
     }
 
     public void deposit(long amount) {
@@ -41,4 +37,22 @@ public class Account {
     public String getOwnerName() { return ownerName; }
     public long getBalance() { return balance; }
     public boolean isActive() { return active; }
+
+    @Override
+    public String toString() {
+        return accountNumber + " | " + ownerName + " | " + balance;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return accountNumber.equals(account.accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(accountNumber);
+    }
 }

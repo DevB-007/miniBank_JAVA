@@ -44,16 +44,23 @@ public class MiniBank {
         System.out.println("Welcome to " + bankInfo.getName() + " (" + bankInfo.getBranch() + ")");
         System.out.println("==========================================\n");
 
-        Account[] accounts = new Account[3];
-        accounts[0] = new Account("Riya", 5000);
-        accounts[1] = new Account("Dev");
-        accounts[2] = new Account("Zara", 10000);
-
-        accounts[0].deposit(2000);
-        accounts[0].withdraw(3000);
-        accounts[0].withdraw(10000);
+        Account acc1 = new Account("Riya", 4000);
+        Account acc2 = new Account("Dev", 5000);
         
-        System.out.println("Account 0 Balance: " + accounts[0].getBalance());
+        System.out.println(acc1.toString());
+        System.out.println("acc1 equals acc2? " + acc1.equals(acc2));
+        System.out.println("Is acc1 an Account? " + (acc1 instanceof Account));
+        
+        try {
+            Customer cust = new Customer("Riya", "riya@test.com", "9876543210");
+            Customer.Address addr = new Customer.Address("123 Main St", "Jamnagar", "361001");
+            cust.setAddress(addr);
+            
+            Customer clonedCust = (Customer) cust.clone();
+            System.out.println("Cloned Customer Name: " + clonedCust.getName());
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
 
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
