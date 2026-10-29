@@ -27,12 +27,14 @@ public abstract class Account {
         }
     }
 
-    public boolean withdraw(long amount) {
-        if (amount > 0 && balance >= amount) {
-            balance -= amount;
-            return true;
+    public void withdraw(long amount) throws InsufficientFundsException {
+        if (amount > 0) {
+            if (balance >= amount) {
+                balance -= amount;
+            } else {
+                throw new InsufficientFundsException("Insufficient balance for withdrawal of " + amount);
+            }
         }
-        return false;
     }
 
     public String getAccountNumber() { return accountNumber; }

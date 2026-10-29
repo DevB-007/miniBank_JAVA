@@ -13,11 +13,13 @@ public class CurrentAccount extends Account {
     }
 
     @Override
-    public boolean withdraw(long amount) {
-        if (amount > 0 && (balance + overdraftLimit) >= amount) {
-            balance -= amount;
-            return true;
+    public void withdraw(long amount) throws InsufficientFundsException {
+        if (amount > 0) {
+            if ((balance + overdraftLimit) >= amount) {
+                balance -= amount;
+            } else {
+                throw new InsufficientFundsException("Overdraft limit exceeded for withdrawal of " + amount);
+            }
         }
-        return false;
     }
 }

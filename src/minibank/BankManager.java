@@ -6,55 +6,40 @@ public class BankManager implements BankOperations {
 
     @Override
     public String openAccount(String ownerName, long initialBalance, int accountType) {
-        if (accountCount >= accounts.length) {
-            return null;
-        }
-        Account newAccount;
-        if (accountType == 1) {
-            newAccount = new SavingsAccount(ownerName, initialBalance, 4.0);
-        } else {
-            newAccount = new CurrentAccount(ownerName, initialBalance, 10000);
-        }
+        if (accountCount >= accounts.length) return null;
+        Account newAccount = (accountType == 1) ? 
+            new SavingsAccount(ownerName, initialBalance, 4.0) : 
+            new CurrentAccount(ownerName, initialBalance, 10000);
         accounts[accountCount++] = newAccount;
         return newAccount.getAccountNumber();
     }
 
-    private Account findAccount(String accountNumber) {
+    private Account findAccount(String accountNumber) throws AccountNotFoundException {
         for (int i = 0; i < accountCount; i++) {
             if (accounts[i].getAccountNumber().equals(accountNumber)) {
                 return accounts[i];
             }
         }
-        return null;
+        throw new AccountNotFoundException("Error: Account " + accountNumber + " does not exist.");
     }
 
     @Override
-    public boolean deposit(String accountNumber, long amount) {
+    public void deposit(String accountNumber, long amount) throws AccountNotFoundException {
         Account acc = findAccount(accountNumber);
-        if (acc != null) {
-            acc.deposit(amount);
-            return true;
-        }
-        return false;
+        acc.deposit(amount);
     }
 
     @Override
-    public boolean withdraw(String accountNumber, long amount) {
+    public void withdraw(String accountNumber, long amount) throws AccountNotFoundException, InsufficientFundsException {
         Account acc = findAccount(accountNumber);
-        if (acc != null) {
-            return acc.withdraw(amount);
-        }
-        return false;
+        acc.withdraw(amount);
     }
 
     @Override
-    public boolean transfer(String fromAccount, String toAccount, long amount) {
+    public void transfer(String fromAccount, String toAccount, long amount) throws AccountNotFoundException, InsufficientFundsException {
         Account from = findAccount(fromAccount);
         Account to = findAccount(toAccount);
-        if (from != null && to != null && from.withdraw(amount)) {
-            to.deposit(amount);
-            return true;
-        }
-        return false;
+        from.withdraw(amount);
+        to.deposit(amount);
     }
 }

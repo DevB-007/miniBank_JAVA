@@ -71,60 +71,54 @@ public class MiniBank {
                 continue;
             }
 
-            switch (option) {
-                case OPEN_ACCOUNT: 
-                    System.out.print("Enter owner name (no spaces): ");
-                    String name = scanner.next();
-                    System.out.print("Enter initial balance: ");
-                    long initBal = scanner.nextLong();
-                    System.out.print("Enter 1 for Savings, 2 for Current: ");
-                    int type = scanner.nextInt();
-                    String newAcc = manager.openAccount(name, initBal, type);
-                    if (newAcc != null) {
+            try {
+                switch (option) {
+                    case OPEN_ACCOUNT: 
+                        System.out.print("Enter owner name: ");
+                        String name = scanner.next();
+                        System.out.print("Enter initial balance: ");
+                        long initBal = scanner.nextLong();
+                        System.out.print("Enter 1 for Savings, 2 for Current: ");
+                        int type = scanner.nextInt();
+                        String newAcc = manager.openAccount(name, initBal, type);
                         System.out.println("Success! Account No: " + newAcc);
-                    } else {
-                        System.out.println("Failed to open account.");
-                    }
-                    break;
-                case DEPOSIT: 
-                    System.out.print("Enter account number: ");
-                    String depAcc = scanner.next();
-                    System.out.print("Enter deposit amount: ");
-                    long depAmt = scanner.nextLong();
-                    if (manager.deposit(depAcc, depAmt)) {
+                        break;
+                    case DEPOSIT: 
+                        System.out.print("Enter account number: ");
+                        String depAcc = scanner.next();
+                        System.out.print("Enter deposit amount: ");
+                        long depAmt = scanner.nextLong();
+                        manager.deposit(depAcc, depAmt);
                         System.out.println("Deposit successful.");
-                    } else {
-                        System.out.println("Deposit failed. Check account number.");
-                    }
-                    break;
-                case WITHDRAW: 
-                    System.out.print("Enter account number: ");
-                    String drawAcc = scanner.next();
-                    System.out.print("Enter withdrawal amount: ");
-                    long drawAmt = scanner.nextLong();
-                    if (manager.withdraw(drawAcc, drawAmt)) {
+                        break;
+                    case WITHDRAW: 
+                        System.out.print("Enter account number: ");
+                        String drawAcc = scanner.next();
+                        System.out.print("Enter withdrawal amount: ");
+                        long drawAmt = scanner.nextLong();
+                        manager.withdraw(drawAcc, drawAmt);
                         System.out.println("Withdrawal successful.");
-                    } else {
-                        System.out.println("Withdrawal failed. Check balance or account number.");
-                    }
-                    break;
-                case TRANSFER: 
-                    System.out.print("Enter source account number: ");
-                    String fromAcc = scanner.next();
-                    System.out.print("Enter destination account number: ");
-                    String toAcc = scanner.next();
-                    System.out.print("Enter transfer amount: ");
-                    long transAmt = scanner.nextLong();
-                    if (manager.transfer(fromAcc, toAcc, transAmt)) {
+                        break;
+                    case TRANSFER: 
+                        System.out.print("Enter source account number: ");
+                        String fromAcc = scanner.next();
+                        System.out.print("Enter destination account number: ");
+                        String toAcc = scanner.next();
+                        System.out.print("Enter transfer amount: ");
+                        long transAmt = scanner.nextLong();
+                        manager.transfer(fromAcc, toAcc, transAmt);
                         System.out.println("Transfer successful.");
-                    } else {
-                        System.out.println("Transfer failed.");
-                    }
-                    break;
-                case EXIT: 
-                    System.out.println("Thank you for using MiniBank. Goodbye!"); 
-                    running = false;
-                    break;
+                        break;
+                    case EXIT: 
+                        System.out.println("Thank you for using MiniBank. Goodbye!"); 
+                        running = false;
+                        break;
+                }
+            } catch (AccountNotFoundException | InsufficientFundsException e) {
+                System.out.println("TRANSACTION FAILED: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("An unexpected error occurred: " + e.getMessage());
+                scanner.nextLine(); 
             }
         }
 
