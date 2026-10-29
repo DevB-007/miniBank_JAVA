@@ -6,7 +6,11 @@ public abstract class Account implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private final String accountNumber;
+    
+    @NotBlank(message = "Owner name cannot be empty.")
+    @MaxLength(value = 15, message = "Owner name must be 15 characters or less.")
     private String ownerName;
+    
     protected long balance;
     private boolean active;
     

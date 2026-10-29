@@ -21,7 +21,8 @@ public class MiniBank {
         WITHDRAW(3),
         TRANSFER(4),
         EXIT(5),
-        TEST_THREADS(6); // New option
+        TEST_THREADS(6),
+        CHECK_BALANCE(7); // Kept from your request
 
         private final int optionNumber;
 
@@ -57,7 +58,8 @@ public class MiniBank {
             System.out.println("4. Transfer");
             System.out.println("5. Exit");
             System.out.println("6. Stress Test (Multithreading)");
-            System.out.print("Enter your choice (1-6): ");
+            System.out.println("7. Check Balance");
+            System.out.print("Enter your choice (1-7): ");
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a valid number.");
@@ -69,7 +71,7 @@ public class MiniBank {
             MenuOption option = MenuOption.fromInt(choice);
 
             if (option == null) {
-                System.out.println("Invalid choice. Please select between 1 and 6.");
+                System.out.println("Invalid choice. Please select between 1 and 7.");
                 continue;
             }
 
@@ -82,8 +84,12 @@ public class MiniBank {
                         long initBal = scanner.nextLong();
                         System.out.print("Enter 1 for Savings, 2 for Current: ");
                         int type = scanner.nextInt();
-                        String newAcc = manager.openAccount(name, initBal, type);
-                        System.out.println("Success! Account No: " + newAcc);
+                        try {
+                            String newAcc = manager.openAccount(name, initBal, type);
+                            System.out.println("Success! Account No: " + newAcc);
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("VALIDATION FAILED: " + e.getMessage());
+                        }
                         break;
                     case DEPOSIT: 
                         System.out.print("Enter account number: ");
@@ -119,17 +125,18 @@ public class MiniBank {
                     case TEST_THREADS:
                         System.out.print("Enter account number to stress test: ");
                         String testAcc = scanner.next();
-                        System.out.println("Spawning multiple ATMs (Threads) to hit the account simultaneously...");
-                        
-                        Thread t1 = new Thread(new TransactionJob(manager, testAcc, true, 2000), "ATM-1 (Deposit)");
-                        Thread t2 = new Thread(new TransactionJob(manager, testAcc, false, 500), "ATM-2 (Withdraw)");
-                        Thread t3 = new Thread(new TransactionJob(manager, testAcc, false, 1000), "ATM-3 (Withdraw)");
-                        
-                        t1.start(); t2.start(); t3.start();
-                        
-                        // Wait for all threads to finish
-                        t1.join(); t2.join(); t3.join();
-                        System.out.println("Multithread test complete. Thread-safety ensured.");
+                        System.out.println("Spawning multiple ATMs (Threads)...");
+                        Thread t1 = new Thread(new TransactionJob(manager, testAcc, true, 2000), "ATM-1");
+                        Thread t2 = new Thread(new TransactionJob(manager, testAcc, false, 500), "ATM-2");
+                        t1.start(); t2.start();
+                        t1.join(); t2.join();
+                        System.out.println("Multithread test complete.");
+                        break;
+                    case CHECK_BALANCE:
+                        System.out.print("Enter account number: ");
+                        String balAcc = scanner.next();
+                        long balance = manager.getBalance(balAcc);
+                        System.out.println("Current Balance for " + balAcc + ": " + balance);
                         break;
                 }
             } catch (AccountNotFoundException | InsufficientFundsException e) {

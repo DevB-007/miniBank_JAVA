@@ -34,11 +34,13 @@ public class BankManager implements BankOperations {
     }
 
     @Override
-    public String openAccount(String ownerName, long initialBalance, int accountType) {
+    public String openAccount(String ownerName, long initialBalance, int accountType) throws IllegalArgumentException {
         Account newAccount = (accountType == 1) ? 
             new SavingsAccount(ownerName, initialBalance, 4.0) : 
             new CurrentAccount(ownerName, initialBalance, 10000);
             
+        ReflectionValidator.validate(newAccount);
+
         accounts.put(newAccount.getAccountNumber(), newAccount);
         return newAccount.getAccountNumber();
     }
@@ -70,5 +72,11 @@ public class BankManager implements BankOperations {
         
         from.withdraw(amount);
         to.deposit(amount);
+    }
+
+    @Override
+    public long getBalance(String accountNumber) throws AccountNotFoundException {
+        Account acc = findAccount(accountNumber);
+        return acc.getBalance();
     }
 }
